@@ -20,11 +20,11 @@ DEFAULTS = {
     "api_base_url": "https://api.deepseek.com",
     "model": "deepseek-v4-flash",
     "max_diff_lines": 1000,
-    "max_input_tokens": 4096,
-    "max_output_tokens": 500,
+    "max_output_tokens": 2048,
     "debug": False,
     "language": "en",
     "ignore_file": ".opencommitignore",
+    "thinking": False,
 }
 
 ENV_MAP = {
@@ -32,11 +32,11 @@ ENV_MAP = {
     "api_base_url": "AI_COMMIT_API_BASE_URL",
     "model": "AI_COMMIT_MODEL",
     "max_diff_lines": "AI_COMMIT_MAX_DIFF_LINES",
-    "max_input_tokens": "AI_COMMIT_MAX_INPUT_TOKENS",
     "max_output_tokens": "AI_COMMIT_MAX_OUTPUT_TOKENS",
     "debug": "AI_COMMIT_DEBUG",
     "language": "AI_COMMIT_LANGUAGE",
     "ignore_file": "AI_COMMIT_IGNORE_FILE",
+    "thinking": "AI_COMMIT_THINKING",
 }
 
 LANG_INSTRUCTIONS = {
@@ -86,12 +86,12 @@ def _error(msg: str) -> None:
 
 
 def _coerce_type(key: str, raw):
-    if key in ("max_diff_lines", "max_input_tokens", "max_output_tokens"):
+    if key in ("max_diff_lines", "max_output_tokens"):
         try:
             return int(raw)
         except (ValueError, TypeError):
             return DEFAULTS[key]
-    if key == "debug":
+    if key == "debug" or key == "thinking":
         return raw in ("true", "True", "1", True)
     return raw
 
@@ -140,6 +140,7 @@ def load_config() -> None:
     )
     _debug(f"API base URL: {cfg_get('api_base_url')}")
     _debug(f"Ignore file: {cfg_get('ignore_file')}")
+    _debug(f"Thinking mode: {cfg_get('thinking')}")
 
 
 def read_ignore_patterns() -> list[str]:

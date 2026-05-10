@@ -24,6 +24,7 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
     api_base_url = config.cfg_get("api_base_url")
     model = config.cfg_get("model")
     max_output_tokens = config.cfg_get("max_output_tokens")
+    thinking = config.cfg_get("thinking")
 
     branch_name = git_util.get_branch_name()
     lang_instruction = _get_lang_instruction()
@@ -47,6 +48,7 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
         ],
         "max_tokens": max_output_tokens,
         "temperature": 0.3,
+        "thinking": {"type": "enabled" if thinking else "disabled"},
     })
 
     config._debug(f"API request body length: {len(request_body)}")

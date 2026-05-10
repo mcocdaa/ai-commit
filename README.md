@@ -62,11 +62,11 @@ Create `.ai-commit.json` in your project root (or `~/.ai-commit.json` for global
   "api_base_url": "https://api.deepseek.com",
   "model": "deepseek-v4-flash",
   "max_diff_lines": 1000,
-  "max_input_tokens": 4096,
-  "max_output_tokens": 500,
+  "max_output_tokens": 2048,
   "debug": false,
   "language": "en",
-  "ignore_file": ".opencommitignore"
+  "ignore_file": ".opencommitignore",
+  "thinking": false
 }
 ```
 
@@ -80,11 +80,11 @@ Environment variables > project `.ai-commit.json` > global `~/.ai-commit.json`
 | `api_base_url` | `AI_COMMIT_API_BASE_URL` | `https://api.deepseek.com` |
 | `model` | `AI_COMMIT_MODEL` | `deepseek-v4-flash` |
 | `max_diff_lines` | `AI_COMMIT_MAX_DIFF_LINES` | `1000` |
-| `max_input_tokens` | `AI_COMMIT_MAX_INPUT_TOKENS` | `4096` |
-| `max_output_tokens` | `AI_COMMIT_MAX_OUTPUT_TOKENS` | `500` |
+| `max_output_tokens` | `AI_COMMIT_MAX_OUTPUT_TOKENS` | `2048` |
 | `debug` | `AI_COMMIT_DEBUG` | `false` |
 | `language` | `AI_COMMIT_LANGUAGE` | `en` |
 | `ignore_file` | `AI_COMMIT_IGNORE_FILE` | `.opencommitignore` |
+| `thinking` | `AI_COMMIT_THINKING` | `false` |
 
 ### API Key Security
 
@@ -115,6 +115,18 @@ repos:
       - id: ai-commit
         verbose: true
 ```
+
+### Thinking Mode (DeepSeek)
+
+DeepSeek V4 models support a reasoning/thinking mode (`deepseek-v4-flash`, `deepseek-v4-pro`, etc.). Set `thinking: true` to enable it, or `thinking: false` for standard chat mode:
+
+```json
+{
+  "thinking": false
+}
+```
+
+When thinking is disabled, the model outputs the commit message directly without intermediate reasoning. This reduces token usage and response time. Use `thinking: false` if you encounter empty responses from the AI (reasoning consumed all output tokens before the model could write the commit message).
 
 ## Dependencies
 

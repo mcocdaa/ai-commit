@@ -83,6 +83,10 @@ repos:
 
 Debug log chain: Config → Raw Diff → Ignore Patterns → Filtered Diff → Processed Diff → System Prompt → User Prompt → API Request → API Response → Final Result
 
+### Thinking Mode Control (DeepSeek)
+
+The `thinking` config option controls DeepSeek's reasoning/thinking mode. `true` enables reasoning (model outputs intermediate thinking + final answer), `false` disables it for direct output. The hook sends `{"thinking": {"type": "enabled/disabled"}}` in the API request body accordingly.
+
 ## Key Design Decisions
 
 1. **Zero pip dependencies** — `urllib.request` + `json` replace `curl` + `jq`; `subprocess` + `fnmatch` replace bash
@@ -93,6 +97,7 @@ Debug log chain: Config → Raw Diff → Ignore Patterns → Filtered Diff → P
 6. **Commit source awareness** — Skips merge/squash/amend, appends for `-m`
 7. **Native Windows support** — All subprocess calls use explicit `encoding='utf-8'` to avoid GBK decode errors
 8. **Written for AI agents** — Structured to be easily understood and modified by AI coding assistants
+9. **Thinking mode control** — DeepSeek reasoning toggle via `thinking: true/false` config, sent as `{"thinking": {"type": "enabled/disabled"}}` in API body
 
 ## Modifying the Code
 
@@ -162,4 +167,5 @@ Create `.opencommitignore`:
 - **UnicodeDecodeError on Windows**: All subprocess calls in `util/git_util.py` use explicit `encoding='utf-8'`
 - **Python not found**: Ensure Python 3.9+ is in PATH
 - **Debug output not visible**: Add `verbose: true` to hook config in `.pre-commit-config.yaml`
+- **Empty AI response with DeepSeek**: Set `thinking: false` to disable reasoning mode, or increase `max_output_tokens` to 2048+
 - **Windows + pre-commit**: Use `pre-commit run --hook-stage prepare-commit-msg` to test
