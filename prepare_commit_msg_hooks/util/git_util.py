@@ -18,6 +18,7 @@ def cmd_output(*cmd: str, retcode: int | None = 0) -> str:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        encoding='utf-8',
     )
     if retcode is not None and proc.returncode != retcode:
         raise GitError(f"Command '{' '.join(cmd)}' returned {proc.returncode}: {proc.stderr.strip()}")
@@ -30,6 +31,7 @@ def git_root() -> str:
             ["git", "rev-parse", "--show-toplevel"],
             stderr=subprocess.DEVNULL,
             text=True,
+            encoding='utf-8',
         ).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return "."
@@ -41,6 +43,7 @@ def get_staged_diff() -> str:
             ["git", "diff", "--cached", "--diff-filter=ACMR", "--unified=3"],
             stderr=subprocess.DEVNULL,
             text=True,
+            encoding='utf-8',
         ).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return ""
@@ -52,6 +55,7 @@ def get_staged_file_stats() -> str:
             ["git", "diff", "--cached", "--numstat"],
             stderr=subprocess.DEVNULL,
             text=True,
+            encoding='utf-8',
         ).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return ""
@@ -63,6 +67,7 @@ def get_branch_name() -> str:
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             stderr=subprocess.DEVNULL,
             text=True,
+            encoding='utf-8',
         ).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return "unknown"
@@ -77,7 +82,7 @@ def find_commit_msg_file() -> str:
     try:
         git_dir = subprocess.check_output(
             ["git", "rev-parse", "--git-dir"],
-            stderr=subprocess.DEVNULL, text=True,
+            stderr=subprocess.DEVNULL, text=True, encoding='utf-8',
         ).strip()
         if git_dir:
             candidates.insert(0, os.path.join(git_dir, "COMMIT_EDITMSG"))

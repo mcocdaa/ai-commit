@@ -29,6 +29,10 @@ def generate_commit_message() -> str | None:
         config._debug("No staged changes found")
         return None
 
+    config._debug(f"Raw diff ({len(raw_diff)} chars)")
+    if len(raw_diff) < 5000:
+        config._debug(f"\n=== RAW DIFF ===\n{raw_diff}\n=== END RAW DIFF ===")
+
     patterns = config.read_ignore_patterns()
     config._debug(f"Ignore patterns: {patterns}")
 
@@ -39,12 +43,16 @@ def generate_commit_message() -> str | None:
         config._debug(f"All files ignored by {config.cfg_get('ignore_file')}")
         return None
 
+    config._debug(f"Filtered diff ({len(filtered_diff)} chars)")
+
     stats = git_util.get_staged_file_stats()
     file_summary = diff_processor.build_file_summary(stats, spec)
 
     processed_diff = diff_processor.abbreviate_diff(filtered_diff, config.cfg_get("max_diff_lines"))
 
     config._debug(f"Processed diff length: {len(processed_diff)}")
+    if len(processed_diff) < 5000:
+        config._debug(f"\n=== PROCESSED DIFF ===\n{processed_diff}\n=== END PROCESSED DIFF ===")
     if file_summary:
         config._debug(f"File summary:\n{file_summary}")
 

@@ -50,6 +50,8 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
     })
 
     config._debug(f"API request body length: {len(request_body)}")
+    config._debug(f"\n=== SYSTEM PROMPT ===\n{config.SYSTEM_PROMPT}\n=== END SYSTEM PROMPT ===")
+    config._debug(f"\n=== USER PROMPT ===\n{user_prompt}\n=== END USER PROMPT ===")
     endpoint = f"{api_base_url.rstrip('/')}/chat/completions"
     config._debug(f"API endpoint: {endpoint}")
 
@@ -67,7 +69,7 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = resp.read().decode("utf-8")
             config._debug(f"HTTP status: {resp.status}")
-            config._debug(f"Response body (first 500 chars): {body[:500]}")
+            config._debug(f"Response body: {body}")
     except urllib.error.HTTPError as exc:
         config._error(f"API request failed (HTTP {exc.code})")
         try:
