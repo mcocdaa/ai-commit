@@ -39,7 +39,7 @@ repos:
 pre-commit install --hook-type prepare-commit-msg
 ```
 
-> **Tip**: If you also ran `pre-commit install` (without `--hook-type`), other hooks may run twice. Add `default_stages: [commit]` at the top of your `.pre-commit-config.yaml` to prevent this. ai-commit's own `stages: [prepare-commit-msg]` is defined in the hook and is not affected.
+> **Tip**: If you also ran `pre-commit install` (without `--hook-type`), other hooks may run twice. Add `default_stages: [pre-commit]` at the top of your `.pre-commit-config.yaml` to prevent this. ai-commit's own `stages: [prepare-commit-msg]` is defined in the hook and is not affected.
 
 ### Local / Testing
 
