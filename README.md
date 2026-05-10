@@ -28,7 +28,7 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.0
+    rev: v1.0.1
     hooks:
       - id: ai-commit
 ```
@@ -38,6 +38,8 @@ repos:
 ```bash
 pre-commit install --hook-type prepare-commit-msg
 ```
+
+> **Tip**: If you also ran `pre-commit install` (without `--hook-type`), other hooks may run twice. Add `default_stages: [commit]` at the top of your `.pre-commit-config.yaml` to prevent this. ai-commit's own `stages: [prepare-commit-msg]` is defined in the hook and is not affected.
 
 ### Local / Testing
 
@@ -110,7 +112,7 @@ Set `debug: true` in `.ai-commit.json` or `AI_COMMIT_DEBUG=true` env var. To see
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.0
+    rev: v1.0.1
     hooks:
       - id: ai-commit
         verbose: true
