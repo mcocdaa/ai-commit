@@ -75,7 +75,7 @@ pre-commit swallows both stdout and stderr from "Passed" hooks by default. To se
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.1
+    rev: v1.0.2
     hooks:
       - id: ai-commit
         verbose: true

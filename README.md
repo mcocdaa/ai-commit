@@ -28,7 +28,7 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.1
+    rev: v1.0.2
     hooks:
       - id: ai-commit
 ```
@@ -112,7 +112,7 @@ Set `debug: true` in `.ai-commit.json` or `AI_COMMIT_DEBUG=true` env var. To see
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.1
+    rev: v1.0.2
     hooks:
       - id: ai-commit
         verbose: true
