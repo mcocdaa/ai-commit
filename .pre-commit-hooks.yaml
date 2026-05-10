@@ -1,0 +1,8 @@
+- id: ai-commit
+  name: AI Commit Message Generator
+  description: Generate Conventional Commits messages using AI (OpenAI-compatible API)
+  entry: ai-commit-gen
+  language: python
+  stages: [prepare-commit-msg]
+  always_run: true
+  pass_filenames: false
