@@ -16,6 +16,7 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 - `git commit` → AI generates the full message
 - `git commit -m "aaa"` → AI appends details after your message "aaa"
 - Native Windows support (no WSL required)
+- Debug mode with full pipeline visibility (`verbose: true` in pre-commit config)
 
 ## Quick Start
 
@@ -26,8 +27,8 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 
 ```yaml
 repos:
-  - repo: https://github.com/<your-username>/ai-commit
-    rev: v2.0.0
+  - repo: https://github.com/mcocdaa/ai-commit.git
+    rev: v1.0.0
     hooks:
       - id: ai-commit
 ```
@@ -58,8 +59,8 @@ Create `.ai-commit.json` in your project root (or `~/.ai-commit.json` for global
 ```json
 {
   "api_key": "",
-  "api_base_url": "https://api.openai.com/v1",
-  "model": "gpt-4o-mini",
+  "api_base_url": "https://api.deepseek.com",
+  "model": "deepseek-v4-flash",
   "max_diff_lines": 1000,
   "max_input_tokens": 4096,
   "max_output_tokens": 500,
@@ -76,8 +77,8 @@ Environment variables > project `.ai-commit.json` > global `~/.ai-commit.json`
 | Config Key | Env Variable | Default |
 |---|---|---|
 | `api_key` | `AI_COMMIT_API_KEY` | `""` |
-| `api_base_url` | `AI_COMMIT_API_BASE_URL` | `https://api.openai.com/v1` |
-| `model` | `AI_COMMIT_MODEL` | `gpt-4o-mini` |
+| `api_base_url` | `AI_COMMIT_API_BASE_URL` | `https://api.deepseek.com` |
+| `model` | `AI_COMMIT_MODEL` | `deepseek-v4-flash` |
 | `max_diff_lines` | `AI_COMMIT_MAX_DIFF_LINES` | `1000` |
 | `max_input_tokens` | `AI_COMMIT_MAX_INPUT_TOKENS` | `4096` |
 | `max_output_tokens` | `AI_COMMIT_MAX_OUTPUT_TOKENS` | `500` |
@@ -102,6 +103,19 @@ package-lock.json
 dist/
 ```
 
+### Debug Mode
+
+Set `debug: true` in `.ai-commit.json` or `AI_COMMIT_DEBUG=true` env var. To see debug output during `git commit`, add `verbose: true` to the hook config:
+
+```yaml
+repos:
+  - repo: https://github.com/mcocdaa/ai-commit.git
+    rev: v1.0.0
+    hooks:
+      - id: ai-commit
+        verbose: true
+```
+
 ## Dependencies
 
 - **Python 3.9+** — No pip packages required
@@ -111,11 +125,24 @@ dist/
 
 ```
 ai-commit/
-├── ai_commit_gen.py           # Core logic: diff processing, AI API call
+├── prepare_commit_msg_hooks/
+│   ├── __init__.py
+│   ├── ai_commit_gen.py       # Entry point & orchestration
+│   └── util/
+│       ├── __init__.py
+│       ├── api.py             # OpenAI-compatible API client
+│       ├── config.py          # Configuration & constants
+│       ├── diff_processor.py  # Diff filtering & abbreviation
+│       ├── git_util.py        # Git subprocess wrappers
+│       └── gitignore.py       # fnmatch-based ignore patterns
 ├── .pre-commit-hooks.yaml     # pre-commit framework hook definition
-├── .pre-commit-config.yaml    # Example local config for testing
+├── setup.cfg                  # Package metadata & entry points
+├── setup.py                   # Editable install stub
+├── tests/
+│   └── test_ai_commit_gen.py  # Pytest test suite (22 tests)
 ├── README.md                  # This file
 ├── AGENTS.md                  # AI agent integration guide
+├── LICENSE                    # MIT License
 └── .ai-commit.json            # Configuration (gitignored)
 ```
 
