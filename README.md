@@ -1,5 +1,10 @@
 # ai-commit
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://conventionalcommits.org/)
+
 AI-powered Git commit message generator hook. Generates [Conventional Commits](https://www.conventionalcommits.org/) messages using any OpenAI-compatible API.
 
 **Zero external dependencies** — uses only Python standard library (`json`, `urllib`, `subprocess`, `fnmatch`).
