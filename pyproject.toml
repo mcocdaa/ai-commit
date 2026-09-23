@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai_commit_hooks"
-version = "1.0.2"
+dynamic = ["version"]
 description = "AI-powered Git commit message generator hook for pre-commit."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -37,6 +37,12 @@ dev = [
     "pytest>=8.0.0",
     "ruff>=0.9.0",
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "prepare_commit_msg_hooks.__version__"}
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "testing*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -15,7 +15,7 @@ import os
 import subprocess
 import sys
 
-__version__ = "1.0.2"
+from .. import __version__ as __version__
 
 DEFAULTS = {
     "api_key": "",
