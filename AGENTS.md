@@ -62,7 +62,7 @@ Orchestrates the full pipeline. Dependencies: Python 3.9+ standard library only.
 ### pre-commit Framework Integration
 
 `.pre-commit-hooks.yaml` defines the hook:
-- `entry: ai-commit-gen` — Console script installed via `setup.cfg`
+- `entry: ai-commit-gen` — Console script defined in `pyproject.toml`
 - `language: python` — pre-commit manages virtual environment automatically
 - `stages: [prepare-commit-msg]` — Only runs at the prepare-commit-msg stage
 - `always_run: true` — Runs even with no matching files
@@ -75,7 +75,7 @@ pre-commit swallows both stdout and stderr from "Passed" hooks by default. To se
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.2
+    rev: main
     hooks:
       - id: ai-commit
         verbose: true
@@ -118,7 +118,7 @@ Add a mapping to the `LANG_INSTRUCTIONS` dict in `util/config.py`.
 
 ### Updating Version
 
-Bump `__version__` in `util/config.py` and `version` in `setup.cfg`.
+Bump `__version__` in `prepare_commit_msg_hooks/__init__.py` (single source of truth).
 
 ## Testing
 

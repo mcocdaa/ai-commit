@@ -35,7 +35,7 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.2  # Use the latest release tag from GitHub Releases (or 'main' for latest commits)
+    rev: main  # or specify the latest release tag (see badge above)
     hooks:
       - id: ai-commit
 ```
@@ -123,7 +123,7 @@ Set `debug: true` in `.ai-commit.json` or `AI_COMMIT_DEBUG=true` env var. To see
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.2
+    rev: main
     hooks:
       - id: ai-commit
         verbose: true
@@ -161,9 +161,8 @@ ai-commit/
 │       ├── git_util.py        # Git subprocess wrappers
 │       └── gitignore.py       # .gitignore-style pattern matching
 ├── .pre-commit-hooks.yaml     # pre-commit framework hook definition
-├── setup.cfg                  # Package metadata & entry points
 ├── setup.py                   # Editable install stub
-├── pyproject.toml             # Modern packaging & tool config
+├── pyproject.toml             # Package metadata, build & tool config
 ├── tests/
 │   └── test_ai_commit_gen.py  # Pytest test suite (24 tests)
 ├── README.md                  # This file
