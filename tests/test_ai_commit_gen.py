@@ -1,20 +1,20 @@
 """Tests for ai_commit_gen module."""
 
+from __future__ import annotations
+
 import os
 import sys
-import json
 import tempfile
-from unittest.mock import patch, MagicMock
-
-import pytest
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from prepare_commit_msg_hooks.util import config
-from prepare_commit_msg_hooks.util import diff_processor
-from prepare_commit_msg_hooks.util import git_util
-from prepare_commit_msg_hooks.util import gitignore
-
+from prepare_commit_msg_hooks.util import (
+    config,
+    diff_processor,
+    git_util,
+    gitignore,
+)
 from prepare_commit_msg_hooks.util.config import (
     DEFAULTS,
     _coerce_type,
@@ -76,6 +76,11 @@ class TestGitIgnore:
     def test_comment_skipped(self):
         spec = gitignore.compile_patterns(["# this is a comment", "*.md"])
         assert spec.is_ignored("test.md") is True
+
+    def test_bracket_negation(self):
+        spec = gitignore.compile_patterns(["*[!0-9].txt"])
+        assert spec.is_ignored("abc.txt") is True
+        assert spec.is_ignored("123.txt") is False
 
 
 class TestAbbreviateDiff:
@@ -139,10 +144,17 @@ class TestBuildFileSummary:
 
 
 class TestFindCommitMsgFile:
-    def test_returns_valid_path_in_repo(self):
-        result = git_util.find_commit_msg_file()
-        assert result != ""
-        assert "COMMIT_EDITMSG" in result
+    def test_returns_path_when_file_exists(self, tmp_path):
+        commit_msg = tmp_path / "COMMIT_EDITMSG"
+        commit_msg.write_text("test commit")
+        with patch("subprocess.check_output", return_value=str(tmp_path)):
+            result = git_util.find_commit_msg_file()
+            assert result == str(commit_msg)
+
+    def test_returns_empty_when_not_found(self):
+        with patch("os.path.isfile", return_value=False):
+            result = git_util.find_commit_msg_file()
+            assert result == ""
 
 
 class TestDetectCommitSource:

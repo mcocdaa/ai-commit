@@ -1,6 +1,19 @@
 *.egg-info
+*.egg
 *.py[co]
 __pycache__
 .tox
 dist
+build
 .coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Project config with secrets
+.ai-commit.json
+
+uv.lock

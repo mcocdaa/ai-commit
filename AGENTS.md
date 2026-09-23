@@ -22,7 +22,7 @@ prepare_commit_msg_hooks/
     ├── config.py             # Configuration loading & constants
     ├── diff_processor.py     # Diff filtering & abbreviation
     ├── git_util.py           # Git subprocess wrappers
-    └── gitignore.py          # fnmatch-based ignore pattern matching
+    └── gitignore.py          # .gitignore-style pattern matching
 ```
 
 ### Core Script: `ai_commit_gen.py`
@@ -51,7 +51,7 @@ Orchestrates the full pipeline. Dependencies: Python 3.9+ standard library only.
 | `util/git_util.py` | `find_commit_msg_file()` | Auto-detects `.git/COMMIT_EDITMSG` path |
 | `util/git_util.py` | `detect_commit_source()` | Infers commit source from existing message |
 | `util/gitignore.py` | `compile_patterns()` | Compiles ignore patterns into a spec |
-| `util/gitignore.py` | `is_ignored()` | Checks if a file matches ignore patterns (using `fnmatch`) |
+| `util/gitignore.py` | `is_ignored()` | Checks if a file matches ignore patterns |
 | `util/diff_processor.py` | `filter_diff_by_ignore()` | Removes ignored files from diff |
 | `util/diff_processor.py` | `abbreviate_diff()` | Truncates large diffs with summary |
 | `util/diff_processor.py` | `build_file_summary()` | Creates `+N/-N` summary per file |
@@ -92,7 +92,7 @@ The `thinking` config option controls DeepSeek's reasoning/thinking mode. `true`
 1. **Zero pip dependencies** — `urllib.request` + `json` replace `curl` + `jq`; `subprocess` + `fnmatch` replace bash
 2. **Modular package** — Core logic split into `util/` subpackage for maintainability
 3. **Graceful degradation** — `return 0` on failure; commit never blocked by AI
-4. **fnmatch for ignore** — Uses Python's `fnmatch` instead of bash globbing for cross-platform compatibility
+4. **.gitignore spec matching** — Custom full specification pattern matching (supports `**`, negation, directories)
 5. **Conventional Commits only** — System prompt enforces the spec strictly
 6. **Commit source awareness** — Skips merge/squash/amend, appends for `-m`
 7. **Native Windows support** — All subprocess calls use explicit `encoding='utf-8'` to avoid GBK decode errors

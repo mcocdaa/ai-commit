@@ -4,15 +4,13 @@ AI-powered Git commit message generator hook for pre-commit.
 Zero external dependencies - uses only Python standard library.
 """
 
+from __future__ import annotations
+
 import argparse
 import os
 import sys
 
-from .util import api
-from .util import config
-from .util import diff_processor
-from .util import git_util
-from .util import gitignore
+from .util import api, config, diff_processor, git_util, gitignore
 
 
 def generate_commit_message() -> str | None:

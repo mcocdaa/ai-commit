@@ -4,11 +4,11 @@ Diff processing utilities for ai-commit-gen.
 Handles diff abbreviation, filtering by ignore patterns, and file summary.
 """
 
-import re
-from collections.abc import Iterable
+from __future__ import annotations
 
-from . import config
-from . import gitignore
+import re
+
+from . import config, gitignore
 
 
 def abbreviate_diff(diff: str, max_lines: int) -> str:
@@ -22,8 +22,8 @@ def abbreviate_diff(diff: str, max_lines: int) -> str:
         if m:
             if current_file and current_lines:
                 if line_count > max_lines:
-                    added = sum(1 for l in current_lines if l.startswith("+") and not l.startswith("+++"))
-                    removed = sum(1 for l in current_lines if l.startswith("-") and not l.startswith("---"))
+                    added = sum(1 for item in current_lines if item.startswith("+") and not item.startswith("+++"))
+                    removed = sum(1 for item in current_lines if item.startswith("-") and not item.startswith("---"))
                     result_parts.append(f"--- a/{current_file}")
                     result_parts.append(f"+++ b/{current_file}")
                     result_parts.append(
@@ -38,14 +38,13 @@ def abbreviate_diff(diff: str, max_lines: int) -> str:
             line_count = 0
         else:
             current_lines.append(line)
-            if line.startswith("+") or line.startswith("-"):
-                if not line.startswith("+++") and not line.startswith("---"):
-                    line_count += 1
+            if line.startswith(("+", "-")) and not line.startswith(("+++", "---")):
+                line_count += 1
 
     if current_file and current_lines:
         if line_count > max_lines:
-            added = sum(1 for l in current_lines if l.startswith("+") and not l.startswith("+++"))
-            removed = sum(1 for l in current_lines if l.startswith("-") and not l.startswith("---"))
+            added = sum(1 for item in current_lines if item.startswith("+") and not item.startswith("+++"))
+            removed = sum(1 for item in current_lines if item.startswith("-") and not item.startswith("---"))
             result_parts.append(f"--- a/{current_file}")
             result_parts.append(f"+++ b/{current_file}")
             result_parts.append(

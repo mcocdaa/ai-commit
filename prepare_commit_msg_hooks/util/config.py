@@ -8,12 +8,14 @@ Configuration is loaded from (in order of precedence, later wins):
 4. Environment variables
 """
 
+from __future__ import annotations
+
 import json
 import os
 import subprocess
 import sys
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 DEFAULTS = {
     "api_key": "",
@@ -102,6 +104,8 @@ def _git_root() -> str:
             ["git", "rev-parse", "--show-toplevel"],
             stderr=subprocess.DEVNULL,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         ).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
         return "."

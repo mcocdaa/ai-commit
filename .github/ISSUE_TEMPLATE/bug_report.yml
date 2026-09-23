@@ -1,0 +1,31 @@
+name: Bug Report
+description: Create a report to help us improve ai-commit
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Info
+      description: OS version, Python version (`python --version`), Git version (`git --version`), pre-commit version (`pre-commit --version`).
+      placeholder: |
+        - OS: Windows 11 / Ubuntu 22.04 / macOS Sonoma
+        - Python: 3.11.4
+        - Git: 2.40.0
+        - pre-commit: 3.5.0
+    validations:
+      required: true
+  - type: textarea
+    id: debug-output
+    attributes:
+      label: Debug Output
+      description: Run `AI_COMMIT_DEBUG=true git commit` and paste relevant debug logs here (be sure to mask any API keys).

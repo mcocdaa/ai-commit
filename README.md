@@ -4,6 +4,8 @@
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://conventionalcommits.org/)
+[![CI](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml/badge.svg)](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/mcocdaa/ai-commit?color=blue&label=latest%20release)](https://github.com/mcocdaa/ai-commit/releases/latest)
 
 AI-powered Git commit message generator hook. Generates [Conventional Commits](https://www.conventionalcommits.org/) messages using any OpenAI-compatible API.
 
@@ -33,10 +35,14 @@ AI-powered Git commit message generator hook. Generates [Conventional Commits](h
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.2
+    rev: v1.0.2  # Use the latest release tag from GitHub Releases (or 'main' for latest commits)
     hooks:
       - id: ai-commit
 ```
+
+> 💡 **Tip — Always stay on the latest version**:
+> - Run `pre-commit autoupdate` anytime to automatically update `ai-commit` to the latest release tag.
+> - Or use `rev: main` if you prefer to automatically track the newest changes on `main`.
 
 3. Install the hook:
 
@@ -153,12 +159,13 @@ ai-commit/
 │       ├── config.py          # Configuration & constants
 │       ├── diff_processor.py  # Diff filtering & abbreviation
 │       ├── git_util.py        # Git subprocess wrappers
-│       └── gitignore.py       # fnmatch-based ignore patterns
+│       └── gitignore.py       # .gitignore-style pattern matching
 ├── .pre-commit-hooks.yaml     # pre-commit framework hook definition
 ├── setup.cfg                  # Package metadata & entry points
 ├── setup.py                   # Editable install stub
+├── pyproject.toml             # Modern packaging & tool config
 ├── tests/
-│   └── test_ai_commit_gen.py  # Pytest test suite (22 tests)
+│   └── test_ai_commit_gen.py  # Pytest test suite (24 tests)
 ├── README.md                  # This file
 ├── AGENTS.md                  # AI agent integration guide
 ├── LICENSE                    # MIT License

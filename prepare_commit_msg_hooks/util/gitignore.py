@@ -7,6 +7,8 @@ Implements the .gitignore pattern specification:
 Supports: *, ?, [...], **, leading /, trailing /, ! negation
 """
 
+from __future__ import annotations
+
 import re
 from collections.abc import Iterable
 
@@ -50,9 +52,14 @@ def _glob_segment_to_regex(segment: str) -> str:
                 if inner == '!':
                     result.append(re.escape(bracket_expr))
                 else:
+                    if negated:
+                        inner = inner[1:]
+                        prefix = "^/"
+                    else:
+                        prefix = ""
                     if '/' in inner:
                         inner_expr = ''
-                        k = 1
+                        k = 0
                         while k < len(inner):
                             if inner[k] == '/':
                                 inner_expr += '/'
@@ -61,9 +68,9 @@ def _glob_segment_to_regex(segment: str) -> str:
                             else:
                                 inner_expr += re.escape(inner[k])
                             k += 1
-                        result.append(f'[{"".join(inner_expr)}]')
+                        result.append(f'[{prefix}{"".join(inner_expr)}]')
                     else:
-                        result.append(bracket_expr)
+                        result.append(f'[{prefix}{inner}]')
                 i = j + 1
 
         else:
@@ -150,7 +157,7 @@ class GitIgnoreSpec:
             result = _pattern_to_regex(pat)
             if result is None:
                 continue
-            regex_str, is_negated, is_dir_only = result
+            regex_str, is_negated, _ = result
             compiled = re.compile(regex_str)
             if is_negated:
                 self._include.append(compiled)

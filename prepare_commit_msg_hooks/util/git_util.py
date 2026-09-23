@@ -4,6 +4,8 @@ Git utility functions for ai-commit-gen.
 Provides subprocess wrappers for common git operations used by the hook.
 """
 
+from __future__ import annotations
+
 import os
 import subprocess
 
@@ -15,8 +17,7 @@ class GitError(RuntimeError):
 def cmd_output(*cmd: str, retcode: int | None = 0) -> str:
     proc = subprocess.run(
         cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         text=True,
         encoding='utf-8',
         errors='replace',

@@ -4,14 +4,14 @@ AI API calling module for ai-commit-gen.
 Uses urllib (stdlib) to call OpenAI-compatible chat completions API.
 """
 
+from __future__ import annotations
+
 import json
 import re
-import sys
 import urllib.error
 import urllib.request
 
-from . import config
-from . import git_util
+from . import config, git_util
 
 
 def _get_lang_instruction() -> str:
@@ -40,7 +40,7 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
     )
     user_prompt = "\n".join(user_prompt_parts)
 
-    request_body = json.dumps({
+    payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": config.SYSTEM_PROMPT},
@@ -48,8 +48,13 @@ def call_ai_api(diff_content: str, file_summary: str) -> str:
         ],
         "max_tokens": max_output_tokens,
         "temperature": 0.3,
-        "thinking": {"type": "enabled" if thinking else "disabled"},
-    })
+    }
+    if thinking:
+        payload["thinking"] = {"type": "enabled"}
+    elif "deepseek" in api_base_url.lower() or "deepseek" in model.lower():
+        payload["thinking"] = {"type": "disabled"}
+
+    request_body = json.dumps(payload)
 
     config._debug(f"API request body length: {len(request_body)}")
     config._debug(f"\n=== SYSTEM PROMPT ===\n{config.SYSTEM_PROMPT}\n=== END SYSTEM PROMPT ===")
