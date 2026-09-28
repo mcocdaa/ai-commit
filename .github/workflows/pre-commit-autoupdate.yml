@@ -2,8 +2,8 @@ name: Pre-commit Auto Update
 
 on:
   schedule:
-    # Run every Monday at 00:00 UTC
-    - cron: "0 0 * * 1"
+    # Run on the 1st of every month at 00:00 UTC
+    - cron: "0 0 1 * *"
   workflow_dispatch:
 
 permissions:
@@ -34,6 +34,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore(deps): autoupdate pre-commit hooks"
           title: "chore(deps): autoupdate pre-commit hooks"
-          body: "Automated weekly update of `.pre-commit-config.yaml` hooks."
+          body: "Automated monthly update of `.pre-commit-config.yaml` hooks."
           branch: "chore/pre-commit-autoupdate"
           delete-branch: true
