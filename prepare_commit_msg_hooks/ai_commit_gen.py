@@ -18,7 +18,9 @@ def generate_commit_message() -> str | None:
 
     api_key = config.cfg_get("api_key")
     if not api_key:
-        config._error("API key not configured. Set AI_COMMIT_API_KEY env var or add 'api_key' to .ai-commit.json")
+        config._error(
+            "API key not configured. Set AI_COMMIT_API_KEY env var or add 'api_key' to .ai-commit.json"
+        )
         config._error("Project config: .ai-commit.json | Global config: ~/.ai-commit.json")
         return None
 
@@ -67,18 +69,26 @@ def main(argv: list[str] | None = None) -> int:
         description="Generate AI-powered Conventional Commits messages for pre-commit prepare-commit-msg hook",
     )
     parser.add_argument(
-        'commit_msg_file',
-        nargs='?',
-        default='',
-        help='Path to the commit message file (COMMIT_EDITMSG)',
+        "commit_msg_file",
+        nargs="?",
+        default="",
+        help="Path to the commit message file (COMMIT_EDITMSG)",
     )
     parser.add_argument(
-        'commit_source',
-        nargs='?',
-        default='',
-        help='Commit source: message, merge, squash, amend, or empty',
+        "commit_source",
+        nargs="?",
+        default="",
+        help="Commit source: message, template, merge, squash, commit, amend, or empty",
+    )
+    parser.add_argument(
+        "commit_sha",
+        nargs="?",
+        default="",
+        help="Commit SHA-1 (passed by git for commit/amend)",
     )
     args = parser.parse_args(argv)
+
+    config.load_config()
 
     commit_msg_file = args.commit_msg_file
     commit_source = args.commit_source
@@ -86,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     if not commit_msg_file:
         commit_msg_file = git_util.find_commit_msg_file()
         if not commit_msg_file:
-            config._error("Usage: ai-commit-gen <commit-msg-file> [commit-source]")
+            config._error("Usage: ai-commit-gen <commit-msg-file> [commit-source] [commit-sha]")
             config._error("Auto-detection failed - no COMMIT_EDITMSG found")
             return 1
         config._debug(f"Auto-detected commit msg file: {commit_msg_file}")
@@ -97,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
         config._error(f"Commit message file not found: {commit_msg_file}")
         return 1
 
-    if commit_source in ("merge", "squash", "amend"):
+    if commit_source in ("merge", "squash", "commit", "amend"):
         config._debug(f"Skipping for {commit_source} commit")
         return 0
 
@@ -112,26 +122,22 @@ def main(argv: list[str] | None = None) -> int:
     except OSError:
         existing_msg = ""
 
-    existing_lines = [
-        line for line in existing_msg.splitlines()
-        if not line.startswith("#")
-    ]
-    existing_msg_clean = "\n".join(existing_lines).strip()
+    existing_msg_clean, comment_block = git_util.parse_commit_editmsg(existing_msg)
 
     if existing_msg_clean and commit_source == "message":
-        combined = f"{existing_msg_clean}\n\n{ai_msg}"
-        with open(commit_msg_file, "w", encoding="utf-8") as f:
-            f.write(combined + "\n")
-        config._log("AI message appended after your -m message")
+        final_msg = f"{existing_msg_clean}\n\n{ai_msg}"
+        log_msg = "AI message appended after your -m message"
     elif existing_msg_clean and not commit_source:
-        combined = f"{existing_msg_clean}\n\n{ai_msg}"
-        with open(commit_msg_file, "w", encoding="utf-8") as f:
-            f.write(combined + "\n")
-        config._log("AI message appended after existing message")
+        final_msg = f"{existing_msg_clean}\n\n{ai_msg}"
+        log_msg = "AI message appended after existing message"
     else:
-        with open(commit_msg_file, "w", encoding="utf-8") as f:
-            f.write(ai_msg + "\n")
-        config._log("AI message generated (edit in editor to adjust)")
+        final_msg = ai_msg
+        log_msg = "AI message generated (edit in editor to adjust)"
+
+    output = f"{final_msg}\n\n{comment_block}\n" if comment_block else f"{final_msg}\n"
+    with open(commit_msg_file, "w", encoding="utf-8") as f:
+        f.write(output)
+    config._log(log_msg)
 
     return 0
 

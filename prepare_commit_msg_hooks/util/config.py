@@ -14,10 +14,11 @@ import json
 import os
 import subprocess
 import sys
+from typing import Any
 
 from .. import __version__ as __version__
 
-DEFAULTS = {
+DEFAULTS: dict[str, Any] = {
     "api_key": "",
     "api_base_url": "https://api.deepseek.com",
     "model": "deepseek-v4-flash",
@@ -28,6 +29,17 @@ DEFAULTS = {
     "ignore_file": ".opencommitignore",
     "thinking": False,
 }
+
+DEFAULT_IGNORE_PATTERNS: list[str] = [
+    "uv.lock",
+    "package-lock.json",
+    "pnpm-lock.json",
+    "pnpm-lock.yaml",
+    "Cargo.lock",
+    "poetry.lock",
+    "*.min.js",
+    "*.min.css",
+]
 
 ENV_MAP = {
     "api_key": "AI_COMMIT_API_KEY",
@@ -67,10 +79,10 @@ Rules:
 8. If multiple types of changes, use the most significant one as the main type"""
 
 
-_cfg: dict = {}
+_cfg: dict[str, Any] = {}
 
 
-def cfg_get(key: str):
+def cfg_get(key: str) -> Any:
     return _cfg.get(key, DEFAULTS.get(key))
 
 
@@ -87,7 +99,7 @@ def _error(msg: str) -> None:
     print(f"[ai-commit ERROR] {msg}", file=sys.stderr)
 
 
-def _coerce_type(key: str, raw):
+def _coerce_type(key: str, raw: Any) -> Any:
     if key in ("max_diff_lines", "max_output_tokens"):
         try:
             return int(raw)
@@ -115,6 +127,10 @@ def load_config() -> None:
     global _cfg
     _cfg = dict(DEFAULTS)
 
+    debug_env = os.environ.get(ENV_MAP["debug"])
+    if debug_env is not None:
+        _cfg["debug"] = _coerce_type("debug", debug_env)
+
     project_root = _git_root()
     candidates = [
         os.path.join(os.path.expanduser("~"), ".ai-commit.json"),
@@ -126,9 +142,12 @@ def load_config() -> None:
             try:
                 with open(path, encoding="utf-8") as f:
                     data = json.load(f)
-                for k, v in data.items():
-                    if k in _cfg:
-                        _cfg[k] = _coerce_type(k, v)
+                if isinstance(data, dict):
+                    for k, v in data.items():
+                        if k in _cfg:
+                            _cfg[k] = _coerce_type(k, v)
+                else:
+                    _debug(f"Ignoring {path}: root JSON value must be an object")
             except (json.JSONDecodeError, OSError) as exc:
                 _debug(f"Failed to read {path}: {exc}")
 
@@ -150,13 +169,13 @@ def load_config() -> None:
 def read_ignore_patterns() -> list[str]:
     project_root = _git_root()
     ignore_path = os.path.join(project_root, cfg_get("ignore_file"))
-    patterns: list[str] = []
+    patterns: list[str] = list(DEFAULT_IGNORE_PATTERNS)
 
     if os.path.isfile(ignore_path):
         with open(ignore_path, encoding="utf-8") as f:
             for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
+                line = line.rstrip("\r\n")
+                if not line.strip() or line.lstrip().startswith("#"):
                     continue
                 patterns.append(line)
 
