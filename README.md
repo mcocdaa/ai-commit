@@ -7,6 +7,12 @@
 [![CI](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml/badge.svg)](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/mcocdaa/ai-commit?color=blue&label=latest%20release)](https://github.com/mcocdaa/ai-commit/releases/latest)
 
+### 🎬 Live Demo
+
+<p align="center">
+  <img src="docs/assets/demo_commit.gif" alt="ai-commit Live Demo" width="820">
+</p>
+
 AI-powered Git commit message generator hook. Generates [Conventional Commits](https://www.conventionalcommits.org/) messages using any OpenAI-compatible API.
 
 **Zero external dependencies** — uses only Python standard library (`json`, `urllib`, `subprocess`, `fnmatch`).
