@@ -1,193 +1,106 @@
+<div align="center">
+
 # ai-commit
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://conventionalcommits.org/)
+Zero-dependency Git prepare-commit-msg hook for Conventional Commits via any OpenAI-compatible API.
+
 [![CI](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml/badge.svg)](https://github.com/mcocdaa/ai-commit/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/mcocdaa/ai-commit?color=blue&label=latest%20release)](https://github.com/mcocdaa/ai-commit/releases/latest)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits)](https://conventionalcommits.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### 🎬 Live Demo
+[English](README.md) · [简体中文](README_CN.md)
 
-<p align="center">
-  <img src="docs/assets/demo_commit.gif" alt="ai-commit Live Demo" width="820">
-</p>
+<img src="docs/assets/demo_commit.gif" alt="ai-commit demo" width="840">
 
-AI-powered Git commit message generator hook. Generates [Conventional Commits](https://www.conventionalcommits.org/) messages using any OpenAI-compatible API.
+</div>
 
-**Zero external dependencies** — uses only Python standard library (`json`, `urllib`, `subprocess`, `fnmatch`).
+## ✨ Highlights
 
-## Features
+- **Zero Third-Party Dependencies** — Powered strictly by the Python 3.9+ standard library (`json`, `urllib`, `subprocess`, `fnmatch`) with no external `pip` packages required.
+- **Seamless `prepare-commit-msg` Workflow** — Generates full [Conventional Commits](https://www.conventionalcommits.org/) messages on `git commit`, or appends structured details when you run `git commit -m "summary"`.
+- **Smart Diff Compression & `.opencommitignore` Filtering** — Automatically excludes lockfiles, minified bundles, and custom `.opencommitignore` patterns while truncating oversized diffs to stay within token budgets.
+- **Universal OpenAI-Compatible Support** — Works out of the box with DeepSeek, OpenAI, Ollama, vLLM, and any `/v1/chat/completions` endpoint.
+- **Multi-Language Output** — Supports commit generation in English (`en`), Simplified/Traditional Chinese (`zh`, `zh-TW`), Japanese (`ja`), and Korean (`ko`).
+- **Graceful Fallback** — Never blocks your Git workflow; if the network or API fails, your commit proceeds normally.
 
-- Generates Conventional Commits format messages from your staged diff
-- Works with any OpenAI-compatible API (DeepSeek, OpenAI, etc.)
-- **Zero external dependencies** — pure Python standard library
-- Respects `.opencommitignore` for excluding files from diff analysis
-- Abbreviates large diffs (configurable threshold, default 1000 lines)
-- Multi-language support (en, zh, zh-TW, ja, ko)
-- Graceful degradation: if AI fails, your commit still proceeds
-- `git commit` → AI generates the full message
-- `git commit -m "aaa"` → AI appends details after your message "aaa"
-- Native Windows support (no WSL required)
-- Debug mode with full pipeline visibility (`verbose: true` in pre-commit config)
+## 🚀 Quick Start
 
-## Quick Start
+### 1. Configure `pre-commit`
 
-### Via pre-commit Framework (Recommended)
-
-1. Install [pre-commit](https://pre-commit.com/): `pip install pre-commit`
-2. Add to your `.pre-commit-config.yaml`:
+Add `ai-commit` to your `.pre-commit-config.yaml` and install the `prepare-commit-msg` hook:
 
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: main  # or specify the latest release tag (see badge above)
+    rev: v1.0.0  # Run `pre-commit autoupdate` for the latest release
     hooks:
       - id: ai-commit
 ```
 
-> 💡 **Tip — Always stay on the latest version**:
-> - Run `pre-commit autoupdate` anytime to automatically update `ai-commit` to the latest release tag.
-> - Or use `rev: main` if you prefer to automatically track the newest changes on `main`.
-
-3. Install the hook:
-
 ```bash
+pip install pre-commit
 pre-commit install --hook-type prepare-commit-msg
 ```
 
-> **Tip**: If you also ran `pre-commit install` (without `--hook-type`), other hooks may run twice. Add `default_stages: [pre-commit]` at the top of your `.pre-commit-config.yaml` to prevent this. ai-commit's own `stages: [prepare-commit-msg]` is defined in the hook and is not affected.
+### 2. Set Your API Key & Commit
 
-### Local / Testing
-
-For local development or testing without a published repo:
-
-```yaml
-repos:
-  - repo: /path/to/ai-commit
-    hooks:
-      - id: ai-commit
+```bash
+export AI_COMMIT_API_KEY="sk-..."
+git add -A && git commit
 ```
 
-Or use `repo: .` if the hook files are in your project root.
+## ⚙️ Configuration
 
-## Configuration
+Configure via environment variables, project `.ai-commit.json`, or global `~/.ai-commit.json` (precedence: `ENV` > `./.ai-commit.json` > `~/.ai-commit.json`):
 
-Create `.ai-commit.json` in your project root (or `~/.ai-commit.json` for global):
+| Environment Variable | `.ai-commit.json` Key | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `AI_COMMIT_API_KEY` | `api_key` | `""` | API key for the OpenAI-compatible provider |
+| `AI_COMMIT_API_BASE_URL` | `api_base_url` | `https://api.deepseek.com` | Base URL for chat completions API |
+| `AI_COMMIT_MODEL` | `model` | `deepseek-v4-flash` | Model identifier used for generation |
+| `AI_COMMIT_LANGUAGE` | `language` | `en` | Output language (`en`, `zh`, `zh-TW`, `ja`, `ko`) |
+| `AI_COMMIT_MAX_DIFF_LINES` | `max_diff_lines` | `1000` | Max diff lines per file before abbreviation |
+| `AI_COMMIT_MAX_OUTPUT_TOKENS` | `max_output_tokens` | `2048` | Max tokens for generated response |
+| `AI_COMMIT_IGNORE_FILE` | `ignore_file` | `.opencommitignore` | Ignore file for excluding paths from diff analysis |
+| `AI_COMMIT_THINKING` | `thinking` | `false` | Enable/disable reasoning mode on DeepSeek models |
+| `AI_COMMIT_DEBUG` | `debug` | `false` | Print diagnostic pipeline logs to `stderr` |
+
+<details>
+<summary><b>Advanced Configuration & Troubleshooting</b></summary>
+
+### Example `.ai-commit.json`
 
 ```json
 {
-  "api_key": "",
   "api_base_url": "https://api.deepseek.com",
   "model": "deepseek-v4-flash",
   "max_diff_lines": 1000,
-  "max_output_tokens": 2048,
-  "debug": false,
   "language": "en",
   "ignore_file": ".opencommitignore",
   "thinking": false
 }
 ```
 
-### Config Priority
+### Custom Ignore Rules (`.opencommitignore`)
 
-Environment variables > project `.ai-commit.json` > global `~/.ai-commit.json`
+Lockfiles (`uv.lock`, `package-lock.json`, `pnpm-lock.yaml`, `Cargo.lock`, `poetry.lock`) and `*.min.js` / `*.min.css` are ignored by default. Add custom `.gitignore`-style patterns in `.opencommitignore`:
 
-| Config Key | Env Variable | Default |
-|---|---|---|
-| `api_key` | `AI_COMMIT_API_KEY` | `""` |
-| `api_base_url` | `AI_COMMIT_API_BASE_URL` | `https://api.deepseek.com` |
-| `model` | `AI_COMMIT_MODEL` | `deepseek-v4-flash` |
-| `max_diff_lines` | `AI_COMMIT_MAX_DIFF_LINES` | `1000` |
-| `max_output_tokens` | `AI_COMMIT_MAX_OUTPUT_TOKENS` | `2048` |
-| `debug` | `AI_COMMIT_DEBUG` | `false` |
-| `language` | `AI_COMMIT_LANGUAGE` | `en` |
-| `ignore_file` | `AI_COMMIT_IGNORE_FILE` | `.opencommitignore` |
-| `thinking` | `AI_COMMIT_THINKING` | `false` |
-
-### API Key Security
-
-- **Recommended**: Set `AI_COMMIT_API_KEY` environment variable
-- **Per-project**: Use `.ai-commit.json` (auto-added to `.gitignore`)
-- **Global**: Use `~/.ai-commit.json` with restricted permissions
-- **Never** commit API keys to version control
-
-### .opencommitignore
-
-Exclude files from diff analysis:
-
-```
+```gitignore
 *.md
-package-lock.json
 dist/
+fixtures/*.json
 ```
 
-### Debug Mode
+### Debugging & Pre-Commit Hook Stages
 
-Set `debug: true` in `.ai-commit.json` or `AI_COMMIT_DEBUG=true` env var. To see debug output during `git commit`, add `verbose: true` to the hook config:
+- **Verbose Hook Output**: Set `AI_COMMIT_DEBUG=true` and add `verbose: true` under `- id: ai-commit` in `.pre-commit-config.yaml` to inspect diff filtering and API payloads.
+- **Avoid Duplicate Hook Runs**: If you use both `pre-commit` and `prepare-commit-msg` hooks, add `default_stages: [pre-commit]` at the top of `.pre-commit-config.yaml`.
 
-```yaml
-repos:
-  - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: main
-    hooks:
-      - id: ai-commit
-        verbose: true
-```
+</details>
 
-### Thinking Mode (DeepSeek)
+## 📄 License
 
-DeepSeek V4 models support a reasoning/thinking mode (`deepseek-v4-flash`, `deepseek-v4-pro`, etc.). Set `thinking: true` to enable it, or `thinking: false` for standard chat mode:
-
-```json
-{
-  "thinking": false
-}
-```
-
-When thinking is disabled, the model outputs the commit message directly without intermediate reasoning. This reduces token usage and response time. Use `thinking: false` if you encounter empty responses from the AI (reasoning consumed all output tokens before the model could write the commit message).
-
-## Dependencies
-
-- **Python 3.9+** — No pip packages required
-- **Git** — Obviously
-
-## File Structure
-
-```
-ai-commit/
-├── prepare_commit_msg_hooks/
-│   ├── __init__.py
-│   ├── ai_commit_gen.py       # Entry point & orchestration
-│   └── util/
-│       ├── __init__.py
-│       ├── api.py             # OpenAI-compatible API client
-│       ├── config.py          # Configuration & constants
-│       ├── diff_processor.py  # Diff filtering & abbreviation
-│       ├── git_util.py        # Git subprocess wrappers
-│       └── gitignore.py       # .gitignore-style pattern matching
-├── .pre-commit-hooks.yaml     # pre-commit framework hook definition
-├── setup.py                   # Editable install stub
-├── pyproject.toml             # Package metadata, build & tool config
-├── tests/
-│   └── test_ai_commit_gen.py  # Pytest test suite (24 tests)
-├── README.md                  # This file
-├── AGENTS.md                  # AI agent integration guide
-├── LICENSE                    # MIT License
-└── .ai-commit.json            # Configuration (gitignored)
-```
-
-## How It Works
-
-1. The `prepare-commit-msg` hook is triggered by Git before the editor opens
-2. The script reads staged diff via `git diff --cached`
-3. Files matching `.opencommitignore` patterns are excluded
-4. Large diffs (per `max_diff_lines`) are abbreviated
-5. The diff + file summary is sent to the OpenAI-compatible chat completions API
-6. The generated commit message is written to the commit message file
-7. If `git commit -m "..."` was used, AI appends after your message
-8. If AI fails for any reason, the commit proceeds normally
-
-## License
-
-MIT
+Released under the [MIT License](LICENSE).
