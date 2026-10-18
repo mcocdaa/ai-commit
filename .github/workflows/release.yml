@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -12,6 +16,7 @@ jobs:
   build-and-release:
     name: Build & Create Release
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -21,16 +26,31 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      - name: Install dependencies & build package
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip build pytest
+          python -m pip install --upgrade pip build twine
+          pip install -e ".[dev]"
+
+      - name: Verify package version matches git tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          python -c "import os, prepare_commit_msg_hooks; expected = os.environ['GITHUB_REF_NAME'].lstrip('v'); actual = prepare_commit_msg_hooks.__version__; assert actual == expected, f'__version__ {actual} != tag {expected}'"
+
+      - name: Run quality gates, tests, build & twine check
+        run: |
+          ruff check .
+          ruff format --check .
+          mypy --strict prepare_commit_msg_hooks
           pytest tests/ -v
           python -m build
+          twine check dist/*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: dist/*
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
           generate_release_notes: true
