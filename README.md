@@ -35,7 +35,7 @@ Add `ai-commit` to your `.pre-commit-config.yaml` and install the `prepare-commi
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.0  # Run `pre-commit autoupdate` for the latest release
+    rev: v1.0.4  # Run `pre-commit autoupdate` for the latest release
     hooks:
       - id: ai-commit
 ```

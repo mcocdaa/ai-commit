@@ -35,7 +35,7 @@
 ```yaml
 repos:
   - repo: https://github.com/mcocdaa/ai-commit.git
-    rev: v1.0.0  # 可运行 `pre-commit autoupdate` 自动更新至最新版本
+    rev: v1.0.4  # 可运行 `pre-commit autoupdate` 自动更新至最新版本
     hooks:
       - id: ai-commit
 ```
@@ -101,6 +101,6 @@ fixtures/*.json
 
 </details>
 
-## 📄 License
+## 📄 开源协议
 
 本项目基于 [MIT License](LICENSE) 开源。
